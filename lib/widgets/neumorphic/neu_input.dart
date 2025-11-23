@@ -44,14 +44,14 @@ class NeuInput extends ConsumerWidget {
         style: TextStyle(
           color: theme.mainText,
           fontSize: 16.0,
-          fontFamily: 'Nunito',
+          // fontFamily removed
         ),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
             color: theme.mainText.withOpacity(0.5),
             fontSize: 16.0,
-            fontFamily: 'Nunito',
+            // fontFamily removed
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(AppConstants.paddingMedium),

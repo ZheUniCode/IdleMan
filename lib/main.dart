@@ -44,7 +44,6 @@ class IdleManApp extends ConsumerWidget {
       theme: ThemeData(
         primaryColor: theme.accent,
         scaffoldBackgroundColor: theme.background,
-        fontFamily: 'Nunito',
         colorScheme: ColorScheme.fromSeed(
           seedColor: theme.accent,
           brightness: theme.isDark ? Brightness.dark : Brightness.light,

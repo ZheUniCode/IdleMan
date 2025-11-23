@@ -80,7 +80,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       fontSize: 80,
                       fontWeight: FontWeight.bold,
                       color: theme.accent,
-                      fontFamily: 'Nunito',
+                      // fontFamily removed
                     ),
                   ),
                 ),
@@ -102,7 +102,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
                       color: theme.mainText,
-                      fontFamily: 'Nunito',
+                      // fontFamily removed
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -111,7 +111,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     style: TextStyle(
                       fontSize: 16,
                       color: theme.mainText.withOpacity(0.7),
-                      fontFamily: 'Nunito',
+                      // fontFamily removed
                     ),
                   ),
                 ],

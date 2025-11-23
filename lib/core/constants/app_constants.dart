@@ -89,5 +89,5 @@ class AppStrings {
   static const String bureaucratCodeHint = 'Enter verification code';
   
   static const String chaseTitle = 'Catch the Button';
-  static const String chaseCounter = '0 / $chaseTargetCount';
+  static const String chaseCounter = '0 / 100';
 }

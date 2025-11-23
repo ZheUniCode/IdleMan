@@ -38,7 +38,7 @@ class DashboardScreen extends ConsumerWidget {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: theme.mainText,
-                        fontFamily: 'Nunito',
+                        // fontFamily removed
                       ),
                     ),
                     NeuIconButton(
@@ -78,7 +78,7 @@ class DashboardScreen extends ConsumerWidget {
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: theme.mainText,
-                                fontFamily: 'Nunito',
+                                // fontFamily removed
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -87,7 +87,7 @@ class DashboardScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: theme.mainText.withOpacity(0.6),
-                                fontFamily: 'Nunito',
+                                // fontFamily removed
                               ),
                             ),
                           ],
@@ -104,7 +104,7 @@ class DashboardScreen extends ConsumerWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: theme.mainText,
-                    fontFamily: 'Nunito',
+                    // fontFamily removed
                   ),
                 ),
                 const SizedBox(height: AppConstants.paddingMedium),
@@ -169,7 +169,7 @@ class DashboardScreen extends ConsumerWidget {
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: theme.mainText,
-              fontFamily: 'Nunito',
+              // fontFamily removed
             ),
           ),
           const SizedBox(height: 4),
@@ -179,7 +179,7 @@ class DashboardScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 12,
               color: theme.mainText.withOpacity(0.6),
-              fontFamily: 'Nunito',
+              // fontFamily removed
             ),
           ),
         ],

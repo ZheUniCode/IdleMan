@@ -44,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: theme.mainText,
-                        fontFamily: 'Nunito',
+                        // fontFamily removed
                       ),
                     ),
                   ],
@@ -81,7 +81,7 @@ class SettingsScreen extends ConsumerWidget {
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                       color: theme.mainText,
-                                      fontFamily: 'Nunito',
+                                      // fontFamily removed
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -92,7 +92,7 @@ class SettingsScreen extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: theme.mainText.withOpacity(0.6),
-                                      fontFamily: 'Nunito',
+                                      // fontFamily removed
                                     ),
                                   ),
                                 ],
@@ -114,7 +114,7 @@ class SettingsScreen extends ConsumerWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: theme.mainText.withOpacity(0.7),
-                        fontFamily: 'Nunito',
+                        // fontFamily removed
                       ),
                     ),
                     const SizedBox(height: AppConstants.paddingSmall),
@@ -143,7 +143,7 @@ class SettingsScreen extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: theme.mainText,
-                                      fontFamily: 'Nunito',
+                                      // fontFamily removed
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -168,7 +168,7 @@ class SettingsScreen extends ConsumerWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: theme.mainText.withOpacity(0.7),
-                        fontFamily: 'Nunito',
+                        // fontFamily removed
                       ),
                     ),
                     const SizedBox(height: AppConstants.paddingSmall),
@@ -191,7 +191,7 @@ class SettingsScreen extends ConsumerWidget {
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: theme.mainText,
-                                    fontFamily: 'Nunito',
+                                    // fontFamily removed
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -200,7 +200,7 @@ class SettingsScreen extends ConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: theme.mainText.withOpacity(0.6),
-                                    fontFamily: 'Nunito',
+                                    // fontFamily removed
                                   ),
                                 ),
                               ],

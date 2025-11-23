@@ -136,7 +136,7 @@ class _BureaucratOverlayState extends ConsumerState<BureaucratOverlay>
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: theme.mainText,
-                              fontFamily: 'Nunito',
+                              // fontFamily removed
                             ),
                           ),
                           const SizedBox(height: AppConstants.paddingLarge),
@@ -146,7 +146,7 @@ class _BureaucratOverlayState extends ConsumerState<BureaucratOverlay>
                             style: TextStyle(
                               fontSize: 14,
                               color: theme.mainText.withOpacity(0.7),
-                              fontFamily: 'Nunito',
+                              // fontFamily removed
                             ),
                           ),
                           const SizedBox(height: AppConstants.paddingSmall),
@@ -162,7 +162,7 @@ class _BureaucratOverlayState extends ConsumerState<BureaucratOverlay>
                             style: TextStyle(
                               fontSize: 14,
                               color: theme.mainText.withOpacity(0.7),
-                              fontFamily: 'Nunito',
+                              // fontFamily removed
                             ),
                           ),
                           const SizedBox(height: AppConstants.paddingSmall),
@@ -178,7 +178,7 @@ class _BureaucratOverlayState extends ConsumerState<BureaucratOverlay>
                             style: TextStyle(
                               fontSize: 14,
                               color: theme.mainText.withOpacity(0.7),
-                              fontFamily: 'Nunito',
+                              // fontFamily removed
                             ),
                           ),
                           const SizedBox(height: AppConstants.paddingSmall),
@@ -199,7 +199,7 @@ class _BureaucratOverlayState extends ConsumerState<BureaucratOverlay>
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: theme.mainText,
-                                  fontFamily: 'Nunito',
+                                  // fontFamily removed
                                 ),
                               ),
                             ),

@@ -92,7 +92,7 @@ class _ChaseOverlayState extends ConsumerState<ChaseOverlay> {
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
                           color: theme.mainText,
-                          fontFamily: 'Nunito',
+                          // fontFamily removed
                         ),
                       ),
                       const SizedBox(height: AppConstants.paddingMedium),
@@ -102,7 +102,7 @@ class _ChaseOverlayState extends ConsumerState<ChaseOverlay> {
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
                           color: theme.accent,
-                          fontFamily: 'Nunito',
+                          // fontFamily removed
                         ),
                       ),
                       const SizedBox(height: AppConstants.paddingLarge),

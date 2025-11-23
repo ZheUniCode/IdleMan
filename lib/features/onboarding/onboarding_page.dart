@@ -45,7 +45,7 @@ class OnboardingPage extends ConsumerWidget {
               fontSize: 32,
               fontWeight: FontWeight.bold,
               color: theme.mainText,
-              fontFamily: 'Nunito',
+              // fontFamily removed
             ),
           ),
           const SizedBox(height: AppConstants.paddingMedium),
@@ -56,7 +56,7 @@ class OnboardingPage extends ConsumerWidget {
             style: TextStyle(
               fontSize: 16,
               color: theme.mainText.withOpacity(0.7),
-              fontFamily: 'Nunito',
+              // fontFamily removed
               height: 1.5,
             ),
           ),

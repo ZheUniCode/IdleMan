@@ -64,16 +64,14 @@ class NeuTheme {
   List<BoxShadow> getPressedInShadows({double distance = 5.0, double blur = 10.0}) {
     return [
       BoxShadow(
-        color: shadowDark,
+        color: shadowLight,
         offset: Offset(-distance, -distance),
         blurRadius: blur,
-        inset: true,
       ),
       BoxShadow(
-        color: shadowLight,
+        color: shadowDark,
         offset: Offset(distance, distance),
         blurRadius: blur,
-        inset: true,
       ),
     ];
   }

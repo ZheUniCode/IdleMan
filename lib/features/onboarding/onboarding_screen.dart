@@ -63,7 +63,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       style: TextStyle(
                         color: theme.mainText.withOpacity(0.6),
                         fontSize: 16,
-                        fontFamily: 'Nunito',
+                        // fontFamily removed
                       ),
                     ),
                   ),
@@ -128,7 +128,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         color: theme.mainText,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Nunito',
+                        // fontFamily removed
                       ),
                     ),
                   ),
