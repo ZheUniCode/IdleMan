@@ -30,7 +30,9 @@ class _ChaseOverlayState extends ConsumerState<ChaseOverlay> {
       if (_tapCount >= AppConstants.chaseTargetCount) {
         // Success - close overlay
         HapticFeedback.heavyImpact();
-        Navigator.of(context).pop();
+        
+        // Close the overlay activity using platform channel
+        SystemNavigator.pop();
         return;
       }
 

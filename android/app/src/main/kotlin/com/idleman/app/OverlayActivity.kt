@@ -47,10 +47,7 @@ class OverlayActivity : FlutterActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Return to home screen when overlay is closed
-        val intent = android.content.Intent(android.content.Intent.ACTION_MAIN)
-        intent.addCategory(android.content.Intent.CATEGORY_HOME)
-        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        // Simply close - let Android return to previous state
+        // Don't force launch home screen
     }
 }

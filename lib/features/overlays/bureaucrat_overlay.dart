@@ -84,7 +84,9 @@ class _BureaucratOverlayState extends ConsumerState<BureaucratOverlay>
 
     // Success - close overlay
     HapticFeedback.mediumImpact();
-    Navigator.of(context).pop();
+    
+    // Close the overlay activity using platform channel
+    SystemNavigator.pop();
   }
 
   @override
