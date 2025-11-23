@@ -51,6 +51,10 @@ class _BlockedAppsScreenState extends ConsumerState<BlockedAppsScreen> {
         'com.google.android.apps.messaging',    // Google Messages
         'com.android.mms',                      // MMS
         'com.android.contacts',                 // Contacts
+        'android',                              // System UI
+        'com.android.systemui',                 // System UI
+        'com.google.android.apps.nexuslauncher', // Launcher
+        'com.android.launcher3',                // Default launcher
       };
       
       final filtered = parsed.where((app) {

@@ -38,7 +38,7 @@ class AppConstants {
   static const double overlayBackgroundOpacity = 0.3;
 
   // Chase game constants
-  static const int chaseTargetCount = 100;
+  static const int chaseTargetCount = 10; // Reduced for testing
   static const double chaseButtonSize = 80.0;
 }
 

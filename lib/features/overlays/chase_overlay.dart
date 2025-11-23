@@ -32,7 +32,7 @@ class _ChaseOverlayState extends ConsumerState<ChaseOverlay> {
         HapticFeedback.heavyImpact();
         
         // Close the overlay activity using platform channel
-        SystemNavigator.pop();
+        const MethodChannel('com.idleman/overlay').invokeMethod('close');
         return;
       }
 

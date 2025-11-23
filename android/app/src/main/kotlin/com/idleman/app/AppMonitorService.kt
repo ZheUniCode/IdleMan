@@ -21,6 +21,9 @@ class AppMonitorService : AccessibilityService() {
 
     private val blockedPackages = mutableSetOf<String>()
     private var isInitialized = false
+    private var lastBlockedPackage: String? = null
+    private var lastBlockTime: Long = 0
+    private val BLOCK_COOLDOWN_MS = 3000 // 3 seconds cooldown
 
     override fun onCreate() {
         super.onCreate()
@@ -45,6 +48,13 @@ class AppMonitorService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event?.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             val packageName = event.packageName?.toString() ?: return
+            
+            // Ignore null, empty, or system UI packages
+            if (packageName.isEmpty() || 
+                packageName == "android" || 
+                packageName == "com.android.systemui") {
+                return
+            }
             
             Log.d("IdleMan", "Window state changed: $packageName")
             
@@ -82,6 +92,18 @@ class AppMonitorService : AccessibilityService() {
             return
         }
         
+        // 🛡️ COOLDOWN CHECK: Prevent rapid re-triggering
+        val currentTime = System.currentTimeMillis()
+        if (packageName == lastBlockedPackage && 
+            currentTime - lastBlockTime < BLOCK_COOLDOWN_MS) {
+            Log.d("IdleMan", "COOLDOWN: Ignoring rapid re-trigger of $packageName")
+            return
+        }
+        
+        // Update cooldown tracking
+        lastBlockedPackage = packageName
+        lastBlockTime = currentTime
+        
         // 🛡️ SAFETY CHECK: Don't block critical system apps
         val criticalApps = setOf(
             "com.android.settings",           // Settings
@@ -91,7 +113,11 @@ class AppMonitorService : AccessibilityService() {
             "com.android.messaging",          // Messaging
             "com.google.android.apps.messaging", // Google Messages
             "com.android.mms",                // MMS
-            "com.android.contacts"            // Contacts (needed for calls)
+            "com.android.contacts",           // Contacts (needed for calls)
+            "android",                        // System UI
+            "com.android.systemui",           // System UI
+            "com.google.android.apps.nexuslauncher", // Launcher
+            "com.android.launcher3"           // Default launcher
         )
         
         if (criticalApps.contains(packageName)) {
@@ -100,10 +126,14 @@ class AppMonitorService : AccessibilityService() {
         }
 
         // Notify Flutter through MethodChannel
-        methodChannel?.invokeMethod("appBlocked", mapOf(
-            "packageName" to packageName,
-            "timestamp" to System.currentTimeMillis()
-        ))
+        try {
+            methodChannel?.invokeMethod("appBlocked", mapOf(
+                "packageName" to packageName,
+                "timestamp" to System.currentTimeMillis()
+            ))
+        } catch (e: Exception) {
+            Log.e("IdleMan", "Error invoking method channel: ${e.message}")
+        }
 
         // Launch overlay activity
         launchOverlay()
@@ -113,11 +143,15 @@ class AppMonitorService : AccessibilityService() {
      * Launch the overlay activity
      */
     private fun launchOverlay() {
-        val intent = Intent(this, OverlayActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        try {
+            val intent = Intent(this, OverlayActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("IdleMan", "Error launching overlay: ${e.message}")
         }
-        startActivity(intent)
     }
 
     /**
