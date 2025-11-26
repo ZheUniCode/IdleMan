@@ -25,13 +25,9 @@ void main() async {
     ),
   );
 
-  // Check onboarding completion
-  final prefs = await Hive.openBox('settings');
-  final onboardingComplete = prefs.get('onboarding_complete', defaultValue: false) as bool;
-
   runApp(
-    ProviderScope(
-      child: IdleManApp(showOnboarding: !onboardingComplete),
+    const ProviderScope(
+      child: IdleManApp(),
     ),
   );
 }
@@ -52,8 +48,7 @@ void overlayMain() async {
 }
 
 class IdleManApp extends ConsumerWidget {
-  final bool showOnboarding;
-  const IdleManApp({super.key, required this.showOnboarding});
+  const IdleManApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,9 +65,9 @@ class IdleManApp extends ConsumerWidget {
           brightness: theme.isDark ? Brightness.dark : Brightness.light,
         ),
       ),
-      initialRoute: showOnboarding ? '/onboarding' : '/dashboard',
+      initialRoute: '/',
       routes: {
-        '/': (context) => showOnboarding ? const OnboardingScreen() : const DashboardScreen(),
+        '/': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/settings': (context) => const SettingsScreen(),

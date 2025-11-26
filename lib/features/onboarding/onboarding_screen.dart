@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_constants.dart';
@@ -18,16 +16,6 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-    @override
-    void initState() {
-      super.initState();
-      _initHive();
-    }
-
-    Future<void> _initHive() async {
-      final appDocumentDir = await getApplicationDocumentsDirectory();
-      Hive.init(appDocumentDir.path);
-    }
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -45,9 +33,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // Mark onboarding complete
-      final prefs = await Hive.openBox('settings');
-      await prefs.put('onboarding_complete', true);
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/dashboard');
       }
@@ -55,10 +40,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _skip() {
-    Hive.openBox('settings').then((prefs) {
-      prefs.put('onboarding_complete', true);
-      Navigator.of(context).pushReplacementNamed('/dashboard');
-    });
+    Navigator.of(context).pushReplacementNamed('/dashboard');
   }
 
   @override
@@ -104,19 +86,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         double value = 1.0;
                         if (_pageController.position.haveDimensions) {
                           value = _pageController.page! - index;
+                          value = (1 - (value.abs() * 0.3)).clamp(0.7, 1.0);
                         }
-                        // Dramatic zoom-out and fade effect
-                        double scale = (1 - (value.abs() * 0.5)).clamp(0.6, 1.0);
-                        double opacity = (1 - (value.abs() * 0.7)).clamp(0.3, 1.0);
-                        double perspective = 0.002;
-                        return Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, perspective)
-                            ..scale(scale, scale)
-                            ..rotateY(value * 0.25),
+                        return Transform.scale(
+                          scale: value,
                           child: Opacity(
-                            opacity: opacity,
+                            opacity: value,
                             child: child,
                           ),
                         );
