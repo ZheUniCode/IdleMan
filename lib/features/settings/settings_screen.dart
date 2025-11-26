@@ -16,78 +16,145 @@ import '../../widgets/neumorphic/neu_button.dart';
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
-  @override
-  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _isServiceEnabled = false;
-  Duration _duration =
-      const Duration(minutes: AppConstants.defaultBypassDuration);
-  OverlayType _selectedOverlay = OverlayType.bureaucrat;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkServiceStatus();
-    _loadDuration();
-    _loadOverlay();
-  }
-
-  Future<void> _loadOverlay() async {
-    final prefs = await SharedPreferences.getInstance();
-    final overlayName =
-        prefs.getString('overlay_type') ?? OverlayType.bureaucrat.name;
-    if (mounted) {
-      setState(() {
-        _selectedOverlay = OverlayType.values.firstWhere(
-          (e) => e.name == overlayName,
-          orElse: () => OverlayType.bureaucrat,
-        );
-      });
-    }
-  }
-
-  Future<void> _loadDuration() async {
-    final prefs = await SharedPreferences.getInstance();
-    final minutes =
-        prefs.getInt('bypass_duration') ?? AppConstants.defaultBypassDuration;
-    if (mounted) {
-      setState(() {
-        _duration = Duration(minutes: minutes);
-      });
-    }
-  }
-
-  Future<void> _checkServiceStatus() async {
-    final isEnabled = await PlatformServices.checkAccessibilityPermission();
-    if (mounted) {
-      setState(() {
-        _isServiceEnabled = isEnabled;
-      });
-    }
-  }
-
   void _showDurationPicker() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (BuildContext builder) {
-        return SizedBox(
-          height: 300,
-          child: CupertinoTimerPicker(
-            mode: CupertinoTimerPickerMode.hm,
-            initialTimerDuration: _duration,
-            onTimerDurationChanged: (Duration newDuration) {
-              if (newDuration.inMinutes > 0) {
-                setState(() {
-                  _duration = newDuration;
-                });
-                SharedPreferences.getInstance().then((prefs) {
-                  prefs.setInt('bypass_duration', newDuration.inMinutes);
-                });
-              }
-            },
+        final theme = ref.watch(themeProvider);
+        int selectedHour = _duration.inHours;
+        int selectedMinute = _duration.inMinutes % 60;
+        return Container(
+          height: 340,
+          decoration: BoxDecoration(
+            color: theme.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            boxShadow: theme.getPopOutShadows(distance: 8, blur: 24),
           ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Hours wheel
+                  Expanded(
+                    child: _customWheel(
+                      theme: theme,
+                      min: 0,
+                      max: 12,
+                      selected: selectedHour,
+                      onChanged: (val) => selectedHour = val,
+                      label: 'Hours',
+                    ),
+                  ),
+                  // Minutes wheel
+                  Expanded(
+                    child: _customWheel(
+                      theme: theme,
+                      min: 0,
+                      max: 59,
+                      selected: selectedMinute,
+                      onChanged: (val) => selectedMinute = val,
+                      label: 'Minutes',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              NeuButton(
+                onTap: () {
+                  final newDuration = Duration(hours: selectedHour, minutes: selectedMinute);
+                  if (newDuration.inMinutes > 0) {
+                    setState(() {
+                      _duration = newDuration;
+                    });
+                    SharedPreferences.getInstance().then((prefs) {
+                      prefs.setInt('bypass_duration', newDuration.inMinutes);
+                    });
+                  }
+                  Navigator.pop(context);
+                },
+                child: const Text('Set Duration'),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _customWheel({
+    required theme,
+    required int min,
+    required int max,
+    required int selected,
+    required Function(int) onChanged,
+    required String label,
+  }) {
+    return Column(
+      children: [
+        Text(label, style: TextStyle(fontSize: 16, color: theme.mainText.withOpacity(0.7))),
+        SizedBox(
+          height: 180,
+          child: Stack(
+            children: [
+              ListWheelScrollView.useDelegate(
+                itemExtent: 48,
+                diameterRatio: 1.2,
+                perspective: 0.003,
+                physics: const FixedExtentScrollPhysics(),
+                onSelectedItemChanged: (val) => onChanged(val + min),
+                childDelegate: ListWheelChildBuilderDelegate(
+                  builder: (context, idx) {
+                    final value = idx + min;
+                    final isSelected = value == selected;
+                    return Center(
+                      child: Text(
+                        value.toString().padLeft(2, '0'),
+                        style: TextStyle(
+                          fontSize: isSelected ? 28 : 20,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? theme.mainText : theme.mainText.withOpacity(0.5),
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: max - min + 1,
+                ),
+                controller: FixedExtentScrollController(initialItem: selected - min),
+              ),
+              // Top divider
+              Positioned(
+                top: 66,
+                left: 0,
+                right: 0,
+                child: Divider(
+                  thickness: 2,
+                  color: theme.mainText.withOpacity(0.12),
+                  height: 2,
+                ),
+              ),
+              // Bottom divider
+              Positioned(
+                bottom: 66,
+                left: 0,
+                right: 0,
+                child: Divider(
+                  thickness: 2,
+                  color: theme.mainText.withOpacity(0.12),
+                  height: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
         );
       },
     );

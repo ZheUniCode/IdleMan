@@ -34,33 +34,35 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       );
     } else {
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/dashboard');
-      }
-    }
-  }
-
-  void _skip() {
-    Navigator.of(context).pushReplacementNamed('/dashboard');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ref.watch(themeProvider);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      body: NeuBackground(
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Skip button
-              Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingMedium),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: TextButton(
-                    onPressed: _skip,
-                    child: Text(
+                  itemBuilder: (context, index) {
+                    return AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        double value = 1.0;
+                        if (_pageController.position.haveDimensions) {
+                          value = _pageController.page! - index;
+                        }
+                        // Stronger zoom-out and fade effect with Z translation
+                        double scale = (1 - (value.abs() * 0.75)).clamp(0.45, 1.0);
+                        double opacity = (1 - (value.abs() * 0.85)).clamp(0.15, 1.0);
+                        double perspective = 0.004;
+                        double zTranslate = -120.0 * value.abs();
+                        return Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..setEntry(3, 2, perspective)
+                            ..scale(scale, scale)
+                            ..translate(0.0, 0.0, zTranslate)
+                            ..rotateY(value * 0.32),
+                          child: Opacity(
+                            opacity: opacity,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: _buildPage(index),
+                    );
+                  },
                       AppStrings.onboardingSkip,
                       style: TextStyle(
                         color: theme.mainText.withOpacity(0.87),
