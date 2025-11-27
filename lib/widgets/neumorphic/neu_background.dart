@@ -75,11 +75,15 @@ class _NeuBackgroundState extends ConsumerState<NeuBackground>
             return AnimatedBuilder(
               animation: _animations[index],
               builder: (context, child) {
+                // Spread blobs evenly by assigning each blob a unique base position
+                final angle = (index / _blobCount) * 2 * math.pi;
+                final baseX = 0.5 + 0.35 * math.cos(angle);
+                final baseY = 0.5 + 0.35 * math.sin(angle);
+                final jitterX = _animations[index].value.dx * 0.15;
+                final jitterY = _animations[index].value.dy * 0.15;
                 return Positioned(
-                  left: size.width * 0.5 +
-                      (_animations[index].value.dx * size.width * 0.3),
-                  top: size.height * 0.5 +
-                      (_animations[index].value.dy * size.height * 0.3),
+                  left: size.width * (baseX + jitterX),
+                  top: size.height * (baseY + jitterY),
                   child: child!,
                 );
               },

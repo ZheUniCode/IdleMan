@@ -35,10 +35,10 @@ class NeuTheme {
   );
 
   /// Night mode theme
-  static const night = NeuTheme(
+  static final night = NeuTheme(
     background: Color(0xFF292D32),
     mainText: Color(0xFFE0E5EC),
-    shadowLight: Color(0xFF353B41),
+    shadowLight: Colors.white.withOpacity(0.08),
     shadowDark: Color(0xFF1E2226),
     accent: Color(0xFF9D96FF),
     mode: AppThemeMode.night,

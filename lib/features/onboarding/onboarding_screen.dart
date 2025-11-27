@@ -100,7 +100,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         // Combine zooming (scale up), sliding, and fading out
                         double scale = (1.0 + value.abs() * 0.35).clamp(1.0, 1.35); // subtle growth
                         double offsetX = value * MediaQuery.of(context).size.width * 0.3; // slide left/right
-                        double opacity = (1.0 - value.abs() * 0.85).clamp(0.15, 1.0); // fades out
+                        double opacity = (1.0 - value.abs() * 2.0).clamp(0.02, 1.0); // fade out quicker
                         return Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()

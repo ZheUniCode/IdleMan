@@ -375,8 +375,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: AppConstants.paddingMedium),
 
-                    const SizedBox(height: AppConstants.paddingMedium),
-
                     // Overlay Type setting
                     NeuCard(
                       child: Padding(
