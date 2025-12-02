@@ -1,3 +1,4 @@
+import 'overlay_main.dart' show OverlayApp;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,11 +7,10 @@ import 'core/theme/theme_provider.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/settings/settings_screen.dart';
-import 'features/overlays/typing_overlay.dart';
 import 'features/overlays/chase_overlay.dart';
 import 'dart:math' as math;
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Hive
@@ -74,29 +74,3 @@ class IdleManApp extends ConsumerWidget {
   }
 }
 
-class OverlayApp extends ConsumerWidget {
-  const OverlayApp({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(themeProvider);
-
-    // Randomly choose between typing and chase overlay
-    final random = math.Random();
-    final showTyping = random.nextBool();
-
-    return MaterialApp(
-      title: 'IdleMan Overlay',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: theme.accent,
-        scaffoldBackgroundColor: Colors.transparent,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: theme.accent,
-          brightness: theme.isDark ? Brightness.dark : Brightness.light,
-        ),
-      ),
-      home: showTyping ? TypingOverlay() : ChaseOverlay(),
-    );
-  }
-}

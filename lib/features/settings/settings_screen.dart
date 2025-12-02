@@ -1,3 +1,4 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,11 +7,112 @@ import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/providers/blocklist_provider.dart';
 import '../../core/services/platform_services.dart';
+import '../../core/services/gate_task_manager.dart';
 import '../../widgets/neumorphic/neu_card.dart';
 import '../../widgets/neumorphic/neu_toggle.dart';
 import '../../widgets/service_status_banner.dart';
 import '../../widgets/neumorphic/neu_background.dart';
 import '../../widgets/neumorphic/neu_button.dart';
+
+
+// Simple task model for Productivity Gate
+class _GateTask {
+  final String text;
+  bool completed;
+  _GateTask(this.text, {this.completed = false});
+}
+
+// --- Neumorphic Inset Input Widget ---
+class _NeuInput extends StatefulWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final Color accentColor;
+  final Color textColor;
+  final void Function(String)? onSubmitted;
+  const _NeuInput({
+    required this.controller,
+    required this.hintText,
+    required this.accentColor,
+    required this.textColor,
+    this.onSubmitted,
+  });
+  @override
+  State<_NeuInput> createState() => _NeuInputState();
+}
+
+class _NeuInputState extends State<_NeuInput> {
+  bool _focused = false;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _focused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // True neumorphic inset: both shadows are 'inset' (simulated in Flutter by stacking containers)
+    // Neumorphic inset style matching the reference images
+    final Color bgColor = Theme.of(context).colorScheme.surface.withOpacity(0.97);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          // Light shadow (top-left, inset)
+          BoxShadow(
+            color: Colors.white.withOpacity(0.7),
+            offset: const Offset(-4, -4),
+            blurRadius: 8,
+          ),
+          // Dark shadow (bottom-right, inset)
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            offset: const Offset(4, 4),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: widget.controller,
+        focusNode: _focusNode,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          hintStyle: TextStyle(
+            color: widget.textColor.withOpacity(0.25),
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          isDense: true,
+          filled: true,
+          fillColor: Colors.transparent,
+        ),
+        style: TextStyle(
+          color: _focused ? widget.accentColor : widget.textColor,
+          fontSize: 18,
+          fontWeight: FontWeight.w400,
+        ),
+        cursorColor: widget.accentColor,
+        onSubmitted: widget.onSubmitted,
+      ),
+    );
+  }
+}
 
 /// Settings Screen
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -20,17 +122,41 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _isServiceEnabled = false;
-  Duration _duration = const Duration(minutes: AppConstants.defaultBypassDuration);
-  OverlayType _selectedOverlay = OverlayType.bureaucrat;
-
+  bool _productivityGateEnabled = false;
+  String _unlockCondition = 'All Tasks for Today';
+  final List<String> _unlockConditions = [
+    'All Tasks for Today',
+    'Top 3 Priority Tasks',
+    'Specific Tag',
+  ];
+  final TextEditingController _taskController = TextEditingController();
+  List<_GateTask> _tasks = [];
   @override
   void initState() {
     super.initState();
     _checkServiceStatus();
     _loadDuration();
     _loadOverlay();
+    _loadTasks();
   }
+
+  Future<void> _loadTasks() async {
+    final pending = await GateTaskManager.getPendingTasks();
+    setState(() {
+      _tasks = pending.map((t) => _GateTask(t)).toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _taskController.dispose();
+    super.dispose();
+  }
+  bool _isServiceEnabled = false;
+  Duration _duration = const Duration(minutes: AppConstants.defaultBypassDuration);
+  OverlayType _selectedOverlay = OverlayType.chase;
+
+
 
   Future<void> _checkServiceStatus() async {
     final isEnabled = await PlatformServices.checkAccessibilityPermission();
@@ -52,16 +178,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadOverlay() async {
-    final prefs = await SharedPreferences.getInstance();
-    final overlayName = prefs.getString('overlay_type') ?? OverlayType.bureaucrat.name;
-    if (mounted) {
-      setState(() {
-        _selectedOverlay = OverlayType.values.firstWhere(
-          (e) => e.name == overlayName,
-          orElse: () => OverlayType.bureaucrat,
-        );
-      });
-    }
+    _selectedOverlay = OverlayType.chase;
   }
 
   void _showDurationPicker() {
@@ -247,6 +364,153 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     horizontal: AppConstants.paddingLarge,
                   ),
                   children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: AppConstants.paddingLarge, bottom: AppConstants.paddingMedium),
+                      child: NeuCard(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppConstants.paddingMedium),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.lock, color: theme.accent, size: 28),
+                                  const SizedBox(width: AppConstants.paddingMedium),
+                                  Text('Productivity Gate',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: theme.mainText)),
+                                  const Spacer(),
+                                  NeuToggle(
+                                    value: _productivityGateEnabled,
+                                    onChanged: (val) {
+                                      setState(() => _productivityGateEnabled = val);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              if (_productivityGateEnabled) ...[
+                                const SizedBox(height: AppConstants.paddingMedium),
+                                Text('Unlock Condition:', style: TextStyle(fontSize: 16, color: theme.mainText)),
+                                const SizedBox(height: 10),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: theme.background,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.10),
+                                        blurRadius: 8,
+                                        offset: const Offset(2, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _unlockCondition,
+                                      isExpanded: true,
+                                      dropdownColor: theme.background,
+                                      style: TextStyle(color: theme.mainText, fontSize: 16),
+                                      items: _unlockConditions.map((c) => DropdownMenuItem(
+                                        value: c,
+                                        child: Text(c, style: TextStyle(color: theme.mainText)),
+                                      )).toList(),
+                                      onChanged: (val) {
+                                        if (val != null) setState(() => _unlockCondition = val);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: AppConstants.paddingSmall),
+                                // --- Task Manager UI ---
+                                Text('Tasks:', style: TextStyle(fontSize: 16, color: theme.mainText)),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _NeuInput(
+                                        controller: _taskController,
+                                        hintText: 'Add a new task',
+                                        accentColor: theme.accent,
+                                        textColor: theme.mainText,
+                                        onSubmitted: (val) async {
+                                          if (val.trim().isNotEmpty) {
+                                            await GateTaskManager.addTasks([val.trim()]);
+                                            _taskController.clear();
+                                            _loadTasks();
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    NeuButton(
+                                      onTap: () async {
+                                        final val = _taskController.text.trim();
+                                        if (val.isEmpty) return;
+                                        if (_tasks.any((t) => t.text == val)) return;
+                                        await GateTaskManager.addTasks([val]);
+                                        debugPrint('Added task: $val');
+                                        _taskController.clear();
+                                        await _loadTasks();
+                                        setState(() {});
+                                      },
+                                      child: const Icon(Icons.add),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                if (_tasks.isEmpty)
+                                  Text('No tasks yet.', style: TextStyle(color: theme.mainText.withOpacity(0.6))),
+                                if (_tasks.isNotEmpty)
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: _tasks.length,
+                                    itemBuilder: (context, idx) {
+                                      final task = _tasks[idx];
+                                      return ListTile(
+                                        leading: Checkbox(
+                                          value: task.completed,
+                                          onChanged: (val) async {
+                                            setState(() {
+                                              task.completed = val ?? false;
+                                            });
+                                            // If all tasks are completed, clear them in storage
+                                            if (_tasks.every((t) => t.completed)) {
+                                              await GateTaskManager.completeAllTasks();
+                                              _loadTasks();
+                                            }
+                                          },
+                                        ),
+                                        title: Text(
+                                          task.text,
+                                          style: TextStyle(
+                                            color: theme.mainText,
+                                            decoration: task.completed ? TextDecoration.lineThrough : null,
+                                          ),
+                                        ),
+                                        trailing: IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () async {
+                                            final newTasks = List<_GateTask>.from(_tasks)..removeAt(idx);
+                                            await GateTaskManager.completeAllTasks();
+                                            if (newTasks.isNotEmpty) {
+                                              await GateTaskManager.addTasks(newTasks.map((e) => e.text).toList());
+                                            }
+                                            _loadTasks();
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                const SizedBox(height: AppConstants.paddingSmall),
+                                Text('Blocked apps are managed in the dashboard.', style: TextStyle(fontSize: 13, color: theme.mainText.withOpacity(0.87))),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.paddingMedium),
                     // Service status banner
                     if (!_isServiceEnabled)
                       ServiceStatusBanner(isServiceEnabled: _isServiceEnabled),
@@ -416,33 +680,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ],
                             ),
                             const SizedBox(height: AppConstants.paddingMedium),
-                            DropdownButton<OverlayType>(
-                              value: _selectedOverlay,
-                              isExpanded: true,
-                              underline: Container(
-                                height: 2,
-                                color: theme.accent,
-                              ),
-                              onChanged: (OverlayType? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    _selectedOverlay = newValue;
-                                  });
-                                  SharedPreferences.getInstance().then((prefs) {
-                                    prefs.setString(
-                                        'overlay_type', newValue.name);
-                                  });
-                                }
-                              },
-                              items: OverlayType.values
-                                  .map<DropdownMenuItem<OverlayType>>(
-                                      (OverlayType value) {
-                                return DropdownMenuItem<OverlayType>(
-                                  value: value,
-                                  child: Text(value.displayName),
-                                );
-                              }).toList(),
-                            ),
+                            Text('Overlay: Chase', style: TextStyle(fontSize: 16, color: theme.mainText)),
                           ],
                         ),
                       ),
