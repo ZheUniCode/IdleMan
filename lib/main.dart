@@ -2,7 +2,7 @@ import 'overlay_main.dart' show OverlayApp;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Removed Hive import
+import 'package:hive_flutter/hive_flutter.dart';
 import 'core/theme/theme_provider.dart';
 import 'features/splash/splash_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
@@ -14,7 +14,8 @@ import 'dart:math' as math;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Removed Hive initialization
+  // Initialize Hive
+  await Hive.initFlutter();
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
@@ -36,7 +37,8 @@ Future<void> main() async {
 void overlayMain() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Removed Hive initialization for overlay
+  // Initialize Hive for overlay
+  await Hive.initFlutter();
 
   runApp(
     const ProviderScope(

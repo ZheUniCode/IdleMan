@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../services/native_service.dart';
 
 /// Model for a blocked app
@@ -29,17 +29,21 @@ class BlockedApp {
 
 /// Notifier for managing blocked apps
 class BlocklistNotifier extends StateNotifier<List<BlockedApp>> {
+  static const String _boxName = 'blocklistBox';
   static const String _blocklistKey = 'blockedApps';
 
   BlocklistNotifier() : super([]) {
     _loadBlocklist();
   }
 
-  /// Load blocklist from SharedPreferences and merge with installed apps
+  /// Load blocklist from Hive and merge with installed apps
   Future<void> _loadBlocklist() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedPackages = (prefs.getStringList(_blocklistKey) ?? <String>[]).toSet();
+      final box = await Hive.openBox(_boxName);
+      final savedPackages =
+          (box.get(_blocklistKey, defaultValue: <String>[]) as List)
+              .cast<String>()
+              .toSet();
 
       // Get installed apps from native
       final installedApps = await NativeService.getInstalledApps();
@@ -106,12 +110,12 @@ class BlocklistNotifier extends StateNotifier<List<BlockedApp>> {
         .toList();
   }
 
-  /// Save blocklist to SharedPreferences
+  /// Save blocklist to Hive
   Future<void> _saveBlocklist() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final box = await Hive.openBox(_boxName);
       final blockedPackages = getBlockedPackages();
-      await prefs.setStringList(_blocklistKey, blockedPackages);
+      await box.put(_blocklistKey, blockedPackages);
     } catch (e) {
       // Handle error
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Removed Hive import
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 // ...existing code...
 import 'features/overlays/chase_overlay.dart';
 import 'features/overlays/overlay_gate.dart';
@@ -12,11 +11,7 @@ import 'core/theme/theme_provider.dart';
 @pragma('vm:entry-point')
 void overlayMain() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Force blocklist and current_package for testing using SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  const testPackage = 'com.android.chrome';
-  await prefs.setStringList('blockedApps', [testPackage]);
-  await prefs.setString('current_package', testPackage);
+  await Hive.initFlutter();
 
   runApp(
     const ProviderScope(
@@ -78,12 +73,12 @@ class OverlayApp extends ConsumerWidget {
 
   /// Checks if the Productivity Gate overlay should be shown.
   Future<bool> _shouldShowGateOverlay() async {
-    // Read Productivity Gate enabled state, current package, and blocklist from SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    final bool gateEnabled = prefs.getBool('productivity_gate_enabled') ?? false;
-    final String currentPackage = prefs.getString('current_package') ?? 'com.example.blocked';
-    print('[DEBUG] Value in SharedPreferences for current_package: $currentPackage');
-    final List<String> blocked = prefs.getStringList('blockedApps') ?? <String>[];
+    // Read Productivity Gate enabled state from Hive
+    final settingsBox = await Hive.openBox('settings');
+    final bool gateEnabled = settingsBox.get('productivity_gate_enabled', defaultValue: false);
+    final String currentPackage = settingsBox.get('current_package', defaultValue: 'com.example.blocked'); // TODO: Replace with real package detection
+    final blocklistBox = await Hive.openBox('blocklistBox');
+    final List blocked = blocklistBox.get('blockedApps', defaultValue: <String>[]);
     final bool appBlocked = blocked.contains(currentPackage);
     print('[DEBUG] Productivity Gate enabled: $gateEnabled');
     print('[DEBUG] Current package: $currentPackage');
