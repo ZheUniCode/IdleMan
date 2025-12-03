@@ -47,14 +47,35 @@ class AppConstants {
 }
 
 enum OverlayType {
-  chase;
+  bureaucrat,
+  chase,
+  typing,
+  random;
 
   String get displayName {
-    return 'Chase';
+    switch (this) {
+      case OverlayType.bureaucrat:
+        return 'Bureaucrat';
+      case OverlayType.chase:
+        return 'Chase';
+      case OverlayType.typing:
+        return 'Typing';
+      case OverlayType.random:
+        return 'Random';
+    }
   }
 
   String get routeName {
-    return '/overlay/chase';
+    switch (this) {
+      case OverlayType.bureaucrat:
+        return '/overlay/bureaucrat';
+      case OverlayType.chase:
+        return '/overlay/chase';
+      case OverlayType.typing:
+        return '/overlay/typing';
+      case OverlayType.random:
+        return '/overlay/random'; // Not a real route, used for logic
+    }
   }
 }
 
