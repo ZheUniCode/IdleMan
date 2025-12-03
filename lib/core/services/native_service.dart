@@ -84,15 +84,4 @@ class NativeService {
       }
     });
   }
-
-  /// Request ignore battery optimization permission
-  static Future<void> requestIgnoreBatteryOptimization() async {
-    await _channel.invokeMethod('requestIgnoreBatteryOptimization');
-  }
-
-  /// Request usage access permission (manual flow)
-  static Future<void> requestUsageAccessPermission() async {
-    const intent = 'android.settings.USAGE_ACCESS_SETTINGS';
-    await _channel.invokeMethod('openSettingsIntent', {'intent': intent});
-  }
 }
