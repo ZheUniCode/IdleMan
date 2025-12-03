@@ -36,7 +36,10 @@ IdleMan is a fully-featured Android application designed to help users manage co
   - Installed apps enumeration
   - Blocklist synchronization
 - [x] OverlayActivity for displaying Flutter overlays
-  - System alert window configuration
+  - Overlay implementation uses full-screen activity with window flags (not true system overlay)
+  - Overlays can appear over other apps via AccessibilityService launching the activity
+  - Does not require SYSTEM_ALERT_WINDOW permission for overlays
+  - Note: This approach may be blocked by some OEMs or future Android versions, but works on most devices
   - Random friction task selection
   - Return to home on dismissal
 - [x] Gradle build configuration
