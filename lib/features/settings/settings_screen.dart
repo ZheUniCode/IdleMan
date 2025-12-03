@@ -6,6 +6,7 @@ import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/providers/blocklist_provider.dart';
 import '../../core/services/platform_services.dart';
+import '../../core/services/native_service.dart';
 import '../../widgets/neumorphic/neu_card.dart';
 import '../../widgets/neumorphic/neu_toggle.dart';
 import '../../widgets/service_status_banner.dart';
@@ -20,6 +21,74 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+    // Add permission request helpers
+    Future<void> _requestAccessibility() async {
+      await NativeService.requestAccessibilityPermission();
+      _checkServiceStatus();
+    }
+    Future<void> _requestOverlay() async {
+      await NativeService.requestOverlayPermission();
+    }
+    Future<void> _requestUsageAccess() async {
+      await NativeService.requestUsageAccessPermission();
+    }
+    Future<void> _requestBatteryOptimization() async {
+      try {
+        await NativeService.requestIgnoreBatteryOptimization();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.battery_charging_full, color: Colors.yellowAccent),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Battery optimization settings opened!', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 2),
+                      Text('To ensure IdleMan works reliably, allow it to ignore battery optimizations.', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.grey[900],
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: 'LEARN MORE',
+              textColor: Colors.yellowAccent,
+              onPressed: () {
+                // TODO: Replace with actual help URL or settings navigation
+                // For now, just show a placeholder
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Visit the help page for more info.')),
+                );
+              },
+            ),
+            duration: const Duration(seconds: 6),
+          ),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.redAccent),
+                const SizedBox(width: 12),
+                const Expanded(child: Text('Could not open battery optimization settings.')),
+              ],
+            ),
+            backgroundColor: Colors.red[900],
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
   bool _isServiceEnabled = false;
   Duration _duration = const Duration(minutes: AppConstants.defaultBypassDuration);
   OverlayType _selectedOverlay = OverlayType.chase;
@@ -459,45 +528,99 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: AppConstants.paddingSmall),
+                    // Accessibility Permission
                     NeuCard(
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.accessibility,
-                            color: theme.accent,
-                            size: 28,
-                          ),
+                          Icon(Icons.accessibility, color: theme.accent, size: 28),
                           const SizedBox(width: AppConstants.paddingMedium),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Accessibility Service',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.mainText,
-                                  ),
-                                ),
+                                Text('Accessibility Service', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.mainText)),
                                 const SizedBox(height: 4),
-                                Text(
-                                  'Required for app monitoring',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: theme.mainText.withOpacity(0.87),
-                                  ),
-                                ),
+                                Text('Required for app monitoring', style: TextStyle(fontSize: 14, color: theme.mainText.withOpacity(0.87))),
                               ],
                             ),
                           ),
-                          Icon(
-                            _isServiceEnabled
-                                ? Icons.check_circle
-                                : Icons.error,
-                            color:
-                                _isServiceEnabled ? Colors.green : Colors.red,
-                            size: 24,
+                          Icon(_isServiceEnabled ? Icons.check_circle : Icons.error, color: _isServiceEnabled ? Colors.green : Colors.red, size: 24),
+                          const SizedBox(width: 8),
+                          NeuButton(
+                            onTap: _requestAccessibility,
+                            child: Text('Grant'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.paddingSmall),
+                    // Overlay Permission (optional)
+                    NeuCard(
+                      child: Row(
+                        children: [
+                          Icon(Icons.window, color: theme.accent, size: 28),
+                          const SizedBox(width: AppConstants.paddingMedium),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Overlay Permission', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.mainText)),
+                                const SizedBox(height: 4),
+                                Text('Optional: Only needed for overlay features. Most users do not need to grant this.', style: TextStyle(fontSize: 14, color: theme.mainText.withOpacity(0.87))),
+                              ],
+                            ),
+                          ),
+                          NeuButton(
+                            onTap: _requestOverlay,
+                            child: Text('Grant'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.paddingSmall),
+                    // Usage Access Permission (optional)
+                    NeuCard(
+                      child: Row(
+                        children: [
+                          Icon(Icons.bar_chart, color: theme.accent, size: 28),
+                          const SizedBox(width: AppConstants.paddingMedium),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Usage Access', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.mainText)),
+                                const SizedBox(height: 4),
+                                Text('Optional: Only needed for app usage statistics. Most users do not need to grant this.', style: TextStyle(fontSize: 14, color: theme.mainText.withOpacity(0.87))),
+                              ],
+                            ),
+                          ),
+                          NeuButton(
+                            onTap: _requestUsageAccess,
+                            child: Text('Grant'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.paddingSmall),
+                    // Battery Optimization Permission
+                    NeuCard(
+                      child: Row(
+                        children: [
+                          Icon(Icons.battery_alert, color: theme.accent, size: 28),
+                          const SizedBox(width: AppConstants.paddingMedium),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Ignore Battery Optimization', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.mainText)),
+                                const SizedBox(height: 4),
+                                Text('Recommended for reliable background operation', style: TextStyle(fontSize: 14, color: theme.mainText.withOpacity(0.87))),
+                              ],
+                            ),
+                          ),
+                          NeuButton(
+                            onTap: _requestBatteryOptimization,
+                            child: Text('Grant'),
                           ),
                         ],
                       ),

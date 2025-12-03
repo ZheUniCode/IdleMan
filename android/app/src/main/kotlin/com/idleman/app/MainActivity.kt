@@ -1,31 +1,29 @@
+    // ...existing code...
+
 package com.idleman.app
 
+import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.text.TextUtils
+import android.view.accessibility.AccessibilityManager
+import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import android.provider.Settings
-import android.content.Intent
-import android.net.Uri
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import android.util.Log
-// import removed
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.idleman/native"
-    private var methodChannel: MethodChannel? = null
 
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        
-        methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
-        methodChannel?.setMethodCallHandler { call, result ->
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
-                "requestIgnoreBatteryOptimization" -> {
-                    requestIgnoreBatteryOptimization()
-                    result.success(null)
-                }
                 "checkAccessibilityPermission" -> {
                     result.success(isAccessibilityServiceEnabled())
                 }
@@ -37,122 +35,80 @@ class MainActivity: FlutterActivity() {
                     result.success(Settings.canDrawOverlays(this))
                 }
                 "requestOverlayPermission" -> {
-                    requestOverlayPermission()
+                    openOverlaySettings()
                     result.success(null)
                 }
-                "updateBlockedApps" -> {
-                    val packages = call.argument<List<String>>("packages")
-                    if (packages != null) {
-                        updateBlockedApps(packages.toSet())
-                        result.success(true)
-                    } else {
-                        result.error("INVALID_ARGUMENT", "Packages list is null", null)
-                    }
+                "requestIgnoreBatteryOptimization" -> {
+                    requestIgnoreBatteryOptimization()
+                    result.success(null)
                 }
-                "getInstalledApps" -> {
-                    val apps = getInstalledApps()
-                    result.success(apps)
+                "openSettingsIntent" -> {
+                    val intentAction = call.argument<String>("intent")
+                    openSettingsIntent(intentAction)
+                    result.success(null)
                 }
-                else -> {
-                    result.notImplemented()
-                }
+                else -> result.notImplemented()
             }
         }
-
-        // Set up method channel for AppMonitorService
-        AppMonitorService.methodChannel = MethodChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            AppMonitorService.CHANNEL_NAME
-        )
     }
 
-    /**
-     * Check if accessibility service is enabled
-     */
+    // --- Permission Checkers ---
+
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val service = "${packageName}/${AppMonitorService::class.java.canonicalName}"
-        val enabledServices = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        return enabledServices?.contains(service) == true
+        val am = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val enabledServices = Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+        val colonSplitter = TextUtils.SimpleStringSplitter(':')
+        colonSplitter.setString(enabledServices ?: "")
+        val myService = "$packageName/${AppMonitorService::class.java.canonicalName}"
+        for (service in colonSplitter) {
+            if (service.equals(myService, ignoreCase = true)) {
+                return true
+            }
+        }
+        // Fallback: check if any enabled service matches our package
+        val enabledList = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+        for (serviceInfo in enabledList) {
+            if (serviceInfo.resolveInfo.serviceInfo.packageName == packageName) {
+                return true
+            }
+        }
+        return false
     }
 
-    /**
-     * Open accessibility settings
-     */
+    // --- Permission Requesters ---
+
     private fun openAccessibilitySettings() {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
 
-    /**
-     * Request ignore battery optimization permission
-     */
+    private fun openOverlaySettings() {
+        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
     private fun requestIgnoreBatteryOptimization() {
-        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-        intent.data = Uri.parse("package:$packageName")
-        startActivity(intent)
-    }
-
-    /**
-     * Request overlay permission
-     */
-    private fun requestOverlayPermission() {
-        if (!Settings.canDrawOverlays(this)) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
-            )
-            startActivity(intent)
+        val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:$packageName")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            }
         }
     }
 
-    /**
-     * Update blocked apps in the accessibility service
-     */
-    private fun updateBlockedApps(packages: Set<String>) {
-        // Save to SharedPreferences so it persists
-        val prefs = getSharedPreferences("idleman_prefs", MODE_PRIVATE)
-        prefs.edit().putStringSet("blocked_apps", packages).apply()
-        
-        Log.d("IdleMan", "Saved ${packages.size} blocked apps to preferences: $packages")
-        
-        // Update the service instance if it's running
-        AppMonitorService.instance?.updateBlockedApps(packages)
-    }
-
-    /**
-     * Get list of installed apps
-     * Returns all launchable apps including system apps
-     */
-    private fun getInstalledApps(): List<Map<String, Any>> {
-        val pm = packageManager
-        val apps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-        
-        Log.d("IdleMan", "Total installed apps: ${apps.size}")
-        
-        return apps.mapNotNull { appInfo ->
-            try {
-                // Get launch intent to verify the app is launchable
-                val launchIntent = pm.getLaunchIntentForPackage(appInfo.packageName)
-                if (launchIntent == null) {
-                    return@mapNotNull null
-                }
-                
-                val isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                
-                mapOf(
-                    "packageName" to appInfo.packageName,
-                    "appName" to pm.getApplicationLabel(appInfo).toString(),
-                    "isSystemApp" to isSystemApp
-                )
-            } catch (e: Exception) {
-                Log.e("IdleMan", "Error getting app info for ${appInfo.packageName}: ${e.message}")
-                null
-            }
-        }.sortedBy { it["appName"] as String }.also {
-            Log.d("IdleMan", "Launchable apps found: ${it.size}")
+    private fun openSettingsIntent(intentAction: String?) {
+        if (intentAction == null) return
+        try {
+            val intent = Intent(intentAction)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Optionally: log or handle error
         }
     }
 }

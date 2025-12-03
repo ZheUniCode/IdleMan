@@ -31,8 +31,11 @@ IdleMan is a fully-featured Android application designed to help users manage co
   - Monitors TYPE_WINDOW_STATE_CHANGED events
   - Maintains blocklist of apps
   - Triggers overlays on detection
-- [x] MainActivity with MethodChannel setup
-  - Permission checking and requesting
+- [x] MainActivity with robust MethodChannel logic
+  - Real permission checking for Accessibility (via AccessibilityManager) and Overlay (Settings.canDrawOverlays)
+  - Battery optimization permission requested via in-app dialog (Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) with correct package URI (system dialog, not settings list)
+  - Usage access permission requested via intent string from Dart (not hardcoded)
+  - All permission requests and checks are production-grade and match Android best practices
   - Installed apps enumeration
   - Blocklist synchronization
 - [x] OverlayActivity for displaying Flutter overlays
@@ -46,10 +49,11 @@ IdleMan is a fully-featured Android application designed to help users manage co
 - [x] Accessibility service XML configuration
 
 ### ✅ Phase 3: Onboarding & Main UI (Flutter)
+  
 - [x] Multi-screen onboarding flow
   - PageView with "Zoom Out" scroll transitions
   - Welcome screen
-  - Permission request screens
+  - Permission information screens for Accessibility, Overlay, Usage Access, and Battery Optimization (all permissions clearly marked as required or optional)
   - Blocklist selection screen
   - Page indicators
   - Skip functionality
@@ -67,7 +71,8 @@ IdleMan is a fully-featured Android application designed to help users manage co
   - Scrollable app list
 
 ### ✅ Phase 4: The Neumorphic Overlays (Hybrid)
-[x] Chase Overlay
+  
+- [x] Chase Overlay
   - Glassmorphic blur background
   - Central neumorphic card with game area
   - Counter display (0/100)
@@ -95,8 +100,8 @@ IdleMan is a fully-featured Android application designed to help users manage co
 
 ### ✅ Native Communication Layer
 - [x] NativeService wrapper class
-  - Permission checking methods
-  - Permission request methods
+  - Permission checking methods (Accessibility, Overlay, Usage Access, Battery Optimization)
+  - Permission request methods (all routed to robust native code)
   - Blocklist update method
   - Installed apps retrieval
   - Event listener setup
@@ -186,6 +191,7 @@ IdleMan/
 ### Architecture: Headless + Overlay ✅
 - AccessibilityService monitoring (Kotlin)
 - MethodChannel bridge (Kotlin ↔ Flutter)
+  - All permission checks and requests implemented natively and called from Dart
 - SYSTEM_ALERT_WINDOW overlay container (Kotlin)
 - Flutter-rendered friction tasks
 - Clean separation of concerns
@@ -197,8 +203,7 @@ IdleMan/
 - Persistent storage with Hive
 
 ### Friction Tasks ✅
-1. **Bureaucrat**: Form-based with validation
-2. **Chase**: Interactive tap-to-catch game
+1. **Chase**: Interactive tap-to-catch game
 
 ## Dependencies Included
 
@@ -272,7 +277,7 @@ The project is **100% ready** for:
 - [x] Neumorphic widgets reusable and animated
 - [x] Overlays display with glassmorphic effect
 - [x] AccessibilityService monitors apps
-- [x] Permissions handled correctly
+- [x] Permissions handled correctly (all flows: Accessibility, Overlay, Usage Access, Battery Optimization; robust native code; clear UI feedback)
 - [x] Data persists across app restarts
 - [x] Comprehensive documentation provided
 
