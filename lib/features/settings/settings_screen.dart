@@ -138,6 +138,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _loadDuration();
     _loadOverlay();
     _loadTasks();
+    _loadProductivityGateEnabled();
+  }
+
+  Future<void> _loadProductivityGateEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool('productivity_gate_enabled') ?? false;
+    if (mounted) {
+      setState(() {
+        _productivityGateEnabled = enabled;
+      });
+    }
   }
 
   Future<void> _loadTasks() async {
@@ -381,8 +392,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   const Spacer(),
                                   NeuToggle(
                                     value: _productivityGateEnabled,
-                                    onChanged: (val) {
+                                    onChanged: (val) async {
                                       setState(() => _productivityGateEnabled = val);
+                                      final prefs = await SharedPreferences.getInstance();
+                                      await prefs.setBool('productivity_gate_enabled', val);
                                     },
                                   ),
                                 ],

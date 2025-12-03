@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_constants.dart';
@@ -29,8 +29,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _skip() async {
-    final prefs = await Hive.openBox('settings');
-    await prefs.put('onboarding_complete', true);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_complete', true);
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/dashboard');
     }
@@ -45,8 +45,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       );
     } else {
       // Mark onboarding complete
-      final prefs = await Hive.openBox('settings');
-      await prefs.put('onboarding_complete', true);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_complete', true);
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/dashboard');
       }

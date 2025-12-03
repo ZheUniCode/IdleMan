@@ -56,7 +56,13 @@ class _ChecklistOverlayState extends State<_ChecklistOverlay> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Complete these tasks to unlock', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text('🔒 Productivity Gate', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                const Text(
+                  'This app is blocked until you complete your tasks.\n\nTo unlock, finish the tasks below. You can manage blocked apps in the dashboard.',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 16),
                 ...List.generate(widget.tasks.length, (i) => CheckboxListTile(
                   value: checked[i],
@@ -106,7 +112,13 @@ class _ForcedPlanningOverlayState extends State<_ForcedPlanningOverlay> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('To unlock, define your next 3 moves', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text('🔒 Productivity Gate', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                const Text(
+                  'This app is blocked until you plan your next steps.\n\nTo unlock, define your next 3 moves. You can manage blocked apps in the dashboard.',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 16),
                 ...List.generate(3, (i) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
