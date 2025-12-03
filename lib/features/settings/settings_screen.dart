@@ -22,7 +22,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isServiceEnabled = false;
   Duration _duration = const Duration(minutes: AppConstants.defaultBypassDuration);
-  OverlayType _selectedOverlay = OverlayType.bureaucrat;
+  OverlayType _selectedOverlay = OverlayType.chase;
 
   @override
   void initState() {
@@ -53,12 +53,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _loadOverlay() async {
     final prefs = await SharedPreferences.getInstance();
-    final overlayName = prefs.getString('overlay_type') ?? OverlayType.bureaucrat.name;
+    final overlayName = prefs.getString('overlay_type') ?? OverlayType.chase.name;
     if (mounted) {
       setState(() {
         _selectedOverlay = OverlayType.values.firstWhere(
           (e) => e.name == overlayName,
-          orElse: () => OverlayType.bureaucrat,
+          orElse: () => OverlayType.chase,
         );
       });
     }
@@ -429,19 +429,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     _selectedOverlay = newValue;
                                   });
                                   SharedPreferences.getInstance().then((prefs) {
-                                    prefs.setString(
-                                        'overlay_type', newValue.name);
+                                    prefs.setString('overlay_type', newValue.name);
                                   });
                                 }
                               },
-                              items: OverlayType.values
-                                  .map<DropdownMenuItem<OverlayType>>(
-                                      (OverlayType value) {
-                                return DropdownMenuItem<OverlayType>(
-                                  value: value,
-                                  child: Text(value.displayName),
-                                );
-                              }).toList(),
+                              items: [
+                                DropdownMenuItem<OverlayType>(
+                                  value: OverlayType.chase,
+                                  child: Text('Chase'),
+                                ),
+                                DropdownMenuItem<OverlayType>(
+                                  value: OverlayType.random,
+                                  child: Text('Random (currently selects Chase)'),
+                                ),
+                              ],
                             ),
                           ],
                         ),

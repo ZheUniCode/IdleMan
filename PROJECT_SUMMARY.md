@@ -67,15 +67,7 @@ IdleMan is a fully-featured Android application designed to help users manage co
   - Scrollable app list
 
 ### ✅ Phase 4: The Neumorphic Overlays (Hybrid)
-- [x] Bureaucrat Overlay
-  - Glassmorphic blur background
-  - Central neumorphic card
-  - Three input fields (Reason, Duration, Code)
-  - Validation logic (code must be "IDLE")
-  - Shake animation on failure
-  - Haptic feedback
-  - Form submission handling
-- [x] Chase Overlay
+[x] Chase Overlay
   - Glassmorphic blur background
   - Central neumorphic card with game area
   - Counter display (0/100)

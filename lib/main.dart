@@ -6,7 +6,6 @@ import 'core/theme/theme_provider.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/settings/settings_screen.dart';
-import 'features/overlays/typing_overlay.dart';
 import 'features/overlays/chase_overlay.dart';
 import 'dart:math' as math;
 
@@ -81,9 +80,6 @@ class OverlayApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
 
-    // Randomly choose between typing and chase overlay
-    final random = math.Random();
-    final showTyping = random.nextBool();
 
     return MaterialApp(
       title: 'IdleMan Overlay',
@@ -96,7 +92,7 @@ class OverlayApp extends ConsumerWidget {
           brightness: theme.isDark ? Brightness.dark : Brightness.light,
         ),
       ),
-      home: showTyping ? TypingOverlay() : ChaseOverlay(),
+      home: ChaseOverlay(),
     );
   }
 }

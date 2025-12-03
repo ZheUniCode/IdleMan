@@ -22,6 +22,10 @@ class MainActivity: FlutterActivity() {
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
         methodChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
+                "requestIgnoreBatteryOptimization" -> {
+                    requestIgnoreBatteryOptimization()
+                    result.success(null)
+                }
                 "checkAccessibilityPermission" -> {
                     result.success(isAccessibilityServiceEnabled())
                 }
@@ -79,6 +83,15 @@ class MainActivity: FlutterActivity() {
      */
     private fun openAccessibilitySettings() {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        startActivity(intent)
+    }
+
+    /**
+     * Request ignore battery optimization permission
+     */
+    private fun requestIgnoreBatteryOptimization() {
+        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+        intent.data = Uri.parse("package:$packageName")
         startActivity(intent)
     }
 
