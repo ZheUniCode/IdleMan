@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/theme/theme_provider.dart';
-import 'features/splash/splash_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/settings/settings_screen.dart';
@@ -65,9 +64,8 @@ class IdleManApp extends ConsumerWidget {
           brightness: theme.isDark ? Brightness.dark : Brightness.light,
         ),
       ),
-      initialRoute: '/',
+      initialRoute: '/onboarding',
       routes: {
-        '/': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/settings': (context) => const SettingsScreen(),

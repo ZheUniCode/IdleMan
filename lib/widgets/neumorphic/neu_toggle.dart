@@ -24,95 +24,66 @@ class NeuToggle extends ConsumerStatefulWidget {
 
 class _NeuToggleState extends ConsumerState<NeuToggle>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: AppConstants.animationMedium),
-      vsync: this,
-    );
-
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.elasticOut,
-    );
-
-    if (widget.value) {
-      _controller.value = 1.0;
-    }
-  }
-
-  @override
-  void didUpdateWidget(NeuToggle oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.value != oldWidget.value) {
-      if (widget.value) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeProvider);
-
-    return GestureDetector(
-      onTap: () => widget.onChanged(!widget.value),
-      child: Container(
-        width: widget.width,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: theme.background,
-          borderRadius: BorderRadius.circular(widget.height / 2),
-          boxShadow: theme.getPressedInShadows(
-            distance: AppConstants.shadowDistanceSmall,
-            blur: AppConstants.shadowBlurSmall,
-          ),
-        ),
-        child: AnimatedBuilder(
-          animation: _animation,
-          builder: (context, child) {
-            return Stack(
-              children: [
-                Positioned(
-                  left: _animation.value * (widget.width - widget.height),
-                  child: Container(
-                    width: widget.height,
-                    height: widget.height,
-                    decoration: BoxDecoration(
-                      color: theme.background,
-                      shape: BoxShape.circle,
-                      boxShadow: theme.getPopOutShadows(
-                        distance: AppConstants.shadowDistanceSmall,
-                        blur: AppConstants.shadowBlurSmall,
-                      ),
-                    ),
-                    child: Center(
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: Center(
+        child: GestureDetector(
+          onTap: () => widget.onChanged(!widget.value),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: widget.width,
+                height: widget.height,
+                decoration: BoxDecoration(
+                  color: theme.background,
+                  borderRadius: BorderRadius.circular(widget.height / 2),
+                  boxShadow: theme.getPressedInShadows(
+                    distance: AppConstants.shadowDistanceSmall,
+                    blur: AppConstants.shadowBlurSmall,
+                  ),
+                ),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.ease,
+                      left: widget.value
+                          ? widget.width - widget.height
+                          : 0,
                       child: Container(
-                        width: widget.height * 0.4,
-                        height: widget.height * 0.4,
+                        width: widget.height,
+                        height: widget.height,
                         decoration: BoxDecoration(
-                          color: theme.accent,
+                          color: theme.background,
                           shape: BoxShape.circle,
+                          boxShadow: theme.getPopOutShadows(
+                            distance: AppConstants.shadowDistanceSmall,
+                            blur: AppConstants.shadowBlurSmall,
+                          ),
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: widget.height * 0.4,
+                            height: widget.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: theme.accent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         ),
       ),
     );
