@@ -26,6 +26,7 @@ IdleMan is an Android application built with Flutter that helps users manage com
   - `stats_provider.dart`: Tracks usage statistics
 
 **Features**
+- `splash/`: Initial splash screen with branded logo
 - `onboarding/`: Multi-step onboarding flow with zoom-out transitions
 - `dashboard/`: Main home screen with stats
 - `settings/`: Configuration and app management
@@ -39,7 +40,7 @@ IdleMan is an Android application built with Flutter that helps users manage com
   - `neu_button.dart`: Tactile button with jelly animation
   - `neu_input.dart`: Pressed-in input fields
   - `neu_toggle.dart`: Animated toggle switch
-  - `neu_background.dart`: Themed background container
+  - `neu_background.dart`: Ambient floating blobs background
 
 #### 2. Kotlin Native Layer (android/)
 
@@ -67,7 +68,7 @@ IdleMan is an Android application built with Flutter that helps users manage com
 3. **Tactile Depth**: 
    - Pop-out: Light shadow top-left, dark shadow bottom-right
    - Pressed-in: Inner shadows with inverted direction
-4. **Ambient Motion**: (Removed)
+4. **Ambient Motion**: Slowly breathing/floating background blobs
 5. **Kinetic Feedback**: Jelly bounce animations on tap with haptic feedback
 
 ### Theme System
@@ -200,7 +201,7 @@ flutter build apk --release
 
 ### Manual Test Checklist
 - [ ] Theme toggle works correctly
-  <!-- Splash screen removed -->
+- [ ] Splash screen displays with logo cutoff
 - [ ] Onboarding zoom transition smooth
 - [ ] Dashboard shows live stats
 - [ ] Settings lists installed apps
@@ -278,4 +279,4 @@ For issues, feature requests, or contributions, please create an issue in the re
 
 **Last Updated**: November 23, 2025
 **Version**: 1.0.0
-                                                                                                                      
+
