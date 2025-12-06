@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "667572846138",
+    "project_id": "idleman-4f19b",
+    "storage_bucket": "idleman-4f19b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667572846138:android:d07052a0aae52c5804bf03",
+        "android_client_info": {
+          "package_name": "com.idleman.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDg4-31MzMmPY-pBCNvyVTFAZ7_la9_V8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

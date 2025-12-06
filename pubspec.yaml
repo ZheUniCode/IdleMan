@@ -1,7 +1,15 @@
+# ============================================================================
+# IDLEMAN v16.0 - "PAPER GARDEN"
+# ============================================================================
+# Codename: Paper Garden
+# Philosophy: Compassionate Discipline
+# Visual Language: "Therapy Paper" (Tactile, Serif, Calm)
+# ============================================================================
+
 name: idleman
-description: An Android application that interrupts compulsive app usage with tactile cognitive friction tasks.
+description: A mindful digital boundary system that acts as a Clinical Guardian, helping users reclaim their time through compassionate discipline.
 publish_to: 'none'
-version: 1.0.0+1
+version: 16.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -10,31 +18,86 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # State Management
+  # -------------------------------------------------------------------------
+  # STATE MANAGEMENT - Riverpod 2.0+ for reactive state
+  # -------------------------------------------------------------------------
   flutter_riverpod: ^2.4.9
   
-  # Local Database
+  # -------------------------------------------------------------------------
+  # LOCAL DATABASE - Hive for NoSQL key-value storage (Local-First Ethics)
+  # -------------------------------------------------------------------------
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   
-  # UI & Animations
+  # -------------------------------------------------------------------------
+  # FILE SYSTEM - Path provider for accessing device directories
+  # -------------------------------------------------------------------------
+  path_provider: ^2.1.1
+  
+  # -------------------------------------------------------------------------
+  # FIREBASE - Backend for Shared Garden (Cloud Layer)
+  # -------------------------------------------------------------------------
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.13.6
+  
+  # -------------------------------------------------------------------------
+  # BACKGROUND TASKS - WorkManager for Hydra Protocol
+  # -------------------------------------------------------------------------
+  workmanager: ^0.9.0
+  idleman_native:
+    path: ./plugins/idleman_native
+  
+  # -------------------------------------------------------------------------
+  # NOTIFICATIONS - Local notifications for Digest Engine
+  # -------------------------------------------------------------------------
+  flutter_local_notifications: ^18.0.0
+  
+  # -------------------------------------------------------------------------
+  # AUDIO - For "Paper" sound effects
+  # -------------------------------------------------------------------------
+  audioplayers: ^5.2.1
+  
+  # -------------------------------------------------------------------------
+  # INTERNATIONALIZATION - Date/Time formatting
+  # -------------------------------------------------------------------------
+  intl: ^0.18.1
+  
+  # -------------------------------------------------------------------------
+  # UI & ANIMATIONS - For smooth "Spring" physics transitions
+  # -------------------------------------------------------------------------
   flutter_animate: ^4.3.0
   
-  # Icons & Assets
+  # -------------------------------------------------------------------------
+  # ICONS & ASSETS - SVG support for custom illustrations
+  # -------------------------------------------------------------------------
   flutter_svg: ^2.0.9
   
-  # Utilities
+  # -------------------------------------------------------------------------
+  # UTILITIES - Device and package information
+  # -------------------------------------------------------------------------
   device_info_plus: ^9.1.1
   package_info_plus: ^5.0.1
   
-  # Permissions
+  # -------------------------------------------------------------------------
+  # PERMISSIONS - For Usage Stats, Accessibility, Overlay permissions
+  # -------------------------------------------------------------------------
   permission_handler: ^11.1.0
   
-  # Device Apps
+  # -------------------------------------------------------------------------
+  # DEVICE APPS - Fetch installed applications for Reflection Engine
+  # -------------------------------------------------------------------------
   installed_apps: ^2.0.0
   
-  # Shared Preferences
+  # -------------------------------------------------------------------------
+  # SHARED PREFERENCES - Lightweight key-value storage
+  # -------------------------------------------------------------------------
   shared_preferences: ^2.2.2
+  
+  # -------------------------------------------------------------------------
+  # GOOGLE FONTS - For Playfair Display (Serif) and Nunito (Sans)
+  # -------------------------------------------------------------------------
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -50,3 +113,4 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/audio/

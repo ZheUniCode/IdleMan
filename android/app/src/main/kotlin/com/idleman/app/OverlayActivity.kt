@@ -29,8 +29,8 @@ class OverlayActivity : FlutterActivity() {
                     val lastBlockedPackage = prefs.getString("last_blocked_package", null)
                     
                     if (lastBlockedPackage != null) {
-                        AppMonitorService.instance?.grantTemporaryBypass(lastBlockedPackage)
-                        android.util.Log.d("IdleMan", "Granted bypass for: $lastBlockedPackage")
+                        AppMonitorService.instance?.grantTemporaryAccess(lastBlockedPackage)
+                        android.util.Log.d("IdleMan", "Granted temporary access for: $lastBlockedPackage")
                     }
                 }
                 
